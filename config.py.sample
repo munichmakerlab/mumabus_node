@@ -1,0 +1,19 @@
+broker = {
+	"hostname": "HOSTNAME_OF_YOUR_MQTT_BROKER",
+	"port": 1883,
+	"user": "MQTT_USERNAME",
+	"password": "MQTT_PASSWORD"
+}
+
+topic_prefix = "mumalab/room/lights/"
+
+devices = { 
+	"led_strip": { "type": "switch", "pins": [2] },
+	"light1": { "type": "switch", "pins": [3] },
+	"light2": { "type": "switch", "pins": [4] },
+	"light3": { "type": "switch", "pins": [5] }
+}
+
+node_name = "mumabus_light01"
+
+arduino_port = "/dev/ttyACM0"
