@@ -1,4 +1,3 @@
-from pyfirmata import Arduino, util
 import mosquitto
 from mumadevices import *
 
@@ -11,10 +10,8 @@ def on_message(mosq, obj, msg):
 	else:
 		return
 	node, topic = node.split('/', 1)
-	
+	print "[MSG] " +  node + ": " + topic + ";" + msg.payload
 	items[node].action(topic, msg.payload)
-
-board = Arduino(config.arduino_port)
 
 # initialize MQTT
 mqtt_client = mosquitto.Mosquitto(config.node_name)
@@ -32,9 +29,10 @@ for (name, details) in config.devices.items():
 			continue
 		item = SwitchDevice(name, board, details["pins"][0])
 		mqtt_client.subscribe(config.topic_prefix + name + "/#", 1)
-	items.append(item)
-
-# Enable relais board
-board.digital[6].write(1)
+	elif details["type"] == "rcswitch":
+		item = RCSwitchDevice(name, details["address"])
+		mqtt_client.subscribe(config.topic_prefix + name + "/#", 1)
+	items[name] = (item)
+	print "Added device " + name
 
 mqtt_client.loop_forever()

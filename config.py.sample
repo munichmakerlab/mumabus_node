@@ -8,12 +8,10 @@ broker = {
 topic_prefix = "mumalab/room/lights/"
 
 devices = { 
-	"led_strip": { "type": "switch", "pins": [2] },
-	"light1": { "type": "switch", "pins": [3] },
-	"light2": { "type": "switch", "pins": [4] },
-	"light3": { "type": "switch", "pins": [5] }
+	"hanging_lights": { "type": "rcswitch", "address": ["A", "1"] },
+	"whiteboard": { "type": "rcswitch", "address": ["A", "2"] }
 }
 
 node_name = "mumabus_light01"
 
-arduino_port = "/dev/ttyACM0"
+rcswitch_path = "/home/severin/dev/rcswitch-pi/send"
