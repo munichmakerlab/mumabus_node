@@ -65,10 +65,10 @@ for (name, details) in config.devices.items():
 			logging.error("Device \"" + name + "\" is invalid.")
 			continue
 		item = SwitchDevice(name, board, details["pins"][0])
-		mqtt_client.subscribe(config.topic_prefix + name + "/#", 1)
+		mqttc.subscribe(config.topic_prefix + name + "/#", 1)
 	elif details["type"] == "rcswitch":
 		item = RCSwitchDevice(name, details["address"])
-		mqtt_client.subscribe(config.topic_prefix + name + "/#", 1)
+		mqttc.subscribe(config.topic_prefix + name + "/#", 1)
 	items[name] = (item)
 	logging.info("Added device " + name)
 
