@@ -8,7 +8,6 @@ import config
 
 def on_connect(mosq, obj, rc):
 	logging.info("Connect with RC " + str(rc))
-	mosq.subscribe(config.topic, 0)
 
 def on_message(mosq, obj, msg):
 	logging.info(msg.topic + " [" + str(msg.qos) + "]: " + str(msg.payload))
@@ -80,9 +79,3 @@ except KeyboardInterrupt:
 
 logging.info("Exiting")
 mqttc.disconnect()
-
-
-
-
-
-mqtt_client.loop_forever()
