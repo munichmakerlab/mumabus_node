@@ -8,6 +8,8 @@ import config
 
 def on_connect(mosq, obj, rc):
 	logging.info("Connect with RC " + str(rc))
+	for topic in topics:
+		mqttc.subscribe(topic, 1)
 
 def on_message(mosq, obj, msg):
 	logging.info(msg.topic + " [" + str(msg.qos) + "]: " + str(msg.payload))
@@ -41,6 +43,24 @@ def try_reconnect(client, time = 60):
 
 logging.basicConfig(format='[%(levelname)s] %(asctime)s %(message)s', datefmt='%Y-%m-%d %H:%M:%S', level=logging.INFO)
 
+items = {}
+topics = []
+
+for (name, details) in config.devices.items():
+	item = {}
+	if details["type"] == "switch":
+		if len(details["pins"]) != 1:
+			logging.error("Device \"" + name + "\" is invalid.")
+			continue
+		item = None # SwitchDevice(name, board, details["pins"][0])
+		
+	elif details["type"] == "rcswitch":
+		item = RCSwitchDevice(name, details["address"])
+		
+	items[name] = (item)
+	topics.append(config.topic_prefix + name + "/#")
+	logging.info("Added device " + name)
+
 logging.info("Initializing MQTT")
 mqttc = paho.Client(config.node_name)
 mqttc.username_pw_set(config.broker["user"], config.broker["password"])
@@ -49,27 +69,14 @@ mqttc.on_connect = on_connect
 mqttc.on_disconnect = on_disconnect
 mqttc.on_subscribe = on_subscribe
 mqttc.on_log = on_log
+
 try:
 	mqttc.connect(config.broker["hostname"], config.broker["port"])
 except:
 	logging.warning("Connection failed. Trying again in 30 seconds")
 	Timer(30, try_reconnect, [mqttc]).start()
 
-items = {}
 
-for (name, details) in config.devices.items():
-	item = {}
-	if details["type"] == "switch":
-		if len(details["pins"]) != 1:
-			logging.error("Device \"" + name + "\" is invalid.")
-			continue
-		item = SwitchDevice(name, board, details["pins"][0])
-		mqttc.subscribe(config.topic_prefix + name + "/#", 1)
-	elif details["type"] == "rcswitch":
-		item = RCSwitchDevice(name, details["address"])
-		mqttc.subscribe(config.topic_prefix + name + "/#", 1)
-	items[name] = (item)
-	logging.info("Added device " + name)
 
 logging.info("Entering loop")
 try:
